@@ -93,8 +93,8 @@ callButton.addEventListener('click', async () => {
 answerButton.addEventListener('click', async () => {
   const callID = callInput.value
   const callDoc = await getDoc(doc(db, 'calls', callID))
-  const offerCandidates = collection(db, 'calls/offerCandidates')
-  const answerCandidates = collection(db, 'calls/answerCandidates')
+  const offerCandidates = collection(db, `calls/${callDoc.id}/offerCandidates`)
+  const answerCandidates = collection(db, `calls/${callDoc.id}/answerCandidates`)
 
   peerConnection.addEventListener('icecandidate', async (e) => e.candidate && await addDoc(answerCandidates, e.candidate.toJSON()))
 
