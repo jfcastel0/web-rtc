@@ -34,6 +34,7 @@ const callInput = document.querySelector('#callInput')
 const answerButton = document.querySelector('#answerButton')
 const remoteVideo = document.querySelector('#remoteVideo')
 const hangupButton = document.querySelector('#hangupButton')
+const callOptions = document.querySelector('#callOptions')
 
 webcamButton.addEventListener('click', async () => {
   localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
@@ -43,12 +44,15 @@ webcamButton.addEventListener('click', async () => {
 
   peerConnection.addEventListener('track', (e) => {
     e.streams[0].getTracks().forEach((track) => remoteStream.addTrack(track))
+    callOptions.style.display = 'none'
+    hangupButton.style.display = 'block'
   })
 
   localVideo.srcObject = localStream
   remoteVideo.srcObject = remoteStream
 
-  callButton.disabled = false
+  webcamButton.style.display = 'none'
+  callOptions.style.display = 'block'
 })
 
 callButton.addEventListener('click', async () => {
@@ -98,10 +102,7 @@ answerButton.addEventListener('click', async () => {
   const offerCandidates = collection(db, `calls/${callDoc.id}/offerCandidates`)
   const answerCandidates = collection(db, `calls/${callDoc.id}/answerCandidates`)
 
-  peerConnection.addEventListener('icecandidate', async (e) => {
-    console.log(e.candidate.toJSON())
-    e.candidate && await addDoc(answerCandidates, e.candidate.toJSON())
-  })
+  peerConnection.addEventListener('icecandidate', async (e) => e.candidate && await addDoc(answerCandidates, e.candidate.toJSON()))
 
   const callData = (await getDoc(doc(db, 'calls', callID))).data()
 
@@ -130,4 +131,6 @@ answerButton.addEventListener('click', async () => {
 
 hangupButton.addEventListener('click', () => {
   peerConnection.close()
+  localVideo.srcObject = null
+  remoteVideo.srcObject = null
 })
