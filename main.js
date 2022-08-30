@@ -15,6 +15,8 @@ const firebaseConfig = {
 initializeApp(firebaseConfig)
 const db = getFirestore()
 
+feather.replace()
+
 const servers = {
   iceServers: [ { urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] } ],
   iceCandidatePoolSize: 10
@@ -26,7 +28,7 @@ let localStream = null
 let remoteStream = null
 
 const webcamButton = document.querySelector('#webcamButton')
-const webcamVideo = document.querySelector('#webcamVideo')
+const localVideo = document.querySelector('#localVideo')
 const callButton = document.querySelector('#callButton')
 const callInput = document.querySelector('#callInput')
 const answerButton = document.querySelector('#answerButton')
@@ -43,7 +45,7 @@ webcamButton.addEventListener('click', async () => {
     e.streams[0].getTracks().forEach((track) => remoteStream.addTrack(track))
   })
 
-  webcamVideo.srcObject = localStream
+  localVideo.srcObject = localStream
   remoteVideo.srcObject = remoteStream
 
   callButton.disabled = false
@@ -96,9 +98,12 @@ answerButton.addEventListener('click', async () => {
   const offerCandidates = collection(db, `calls/${callDoc.id}/offerCandidates`)
   const answerCandidates = collection(db, `calls/${callDoc.id}/answerCandidates`)
 
-  peerConnection.addEventListener('icecandidate', async (e) => e.candidate && await addDoc(answerCandidates, e.candidate.toJSON()))
+  peerConnection.addEventListener('icecandidate', async (e) => {
+    console.log(e.candidate.toJSON())
+    e.candidate && await addDoc(answerCandidates, e.candidate.toJSON())
+  })
 
-  const callData = (await getDoc(callDoc)).data()
+  const callData = (await getDoc(doc(db, 'calls', callID))).data()
 
   const offerDescription = callData.offer
   await peerConnection.setRemoteDescription(new RTCSessionDescription(offerDescription))
@@ -111,7 +116,7 @@ answerButton.addEventListener('click', async () => {
     type: answerDescription.type
   }
 
-  await updateDoc(callDoc, { answer })
+  await updateDoc(doc(db, 'calls', callID), { answer })
 
   onSnapshot(offerCandidates, (snapshot) => {
     snapshot.docChanges().forEach((change) => {
