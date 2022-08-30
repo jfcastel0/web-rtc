@@ -35,6 +35,9 @@ const answerButton = document.querySelector('#answerButton')
 const remoteVideo = document.querySelector('#remoteVideo')
 const hangupButton = document.querySelector('#hangupButton')
 const callOptions = document.querySelector('#callOptions')
+const callCode = document.querySelector('#callCode')
+const customInput = document.querySelector('#customInput')
+const orDiv = document.querySelector('#or')
 
 webcamButton.addEventListener('click', async () => {
   localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
@@ -61,7 +64,6 @@ callButton.addEventListener('click', async () => {
     const offerCandidates = collection(db, `calls/${callDoc.id}/offerCandidates`)
     const answerCandidates = collection(db, `calls/${callDoc.id}/answerCandidates`)
   
-    callInput.value = callDoc.id
     peerConnection.addEventListener('icecandidate', async (e) => e.candidate && await addDoc(offerCandidates, e.candidate.toJSON()))
   
     const offerDescription = await peerConnection.createOffer()
@@ -90,6 +92,12 @@ callButton.addEventListener('click', async () => {
         }
       })
     })
+
+    callButton.style.display = 'none'
+    customInput.style.display = 'none'
+    orDiv.style.display = 'none'
+    callCode.innerHTML += ` ${callDoc.id}`
+    callCode.style.display = 'block'
   }
   catch(err) {
     console.log(err)

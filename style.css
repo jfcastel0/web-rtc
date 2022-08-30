@@ -69,13 +69,13 @@ h1 {
     display: none;
 }
 
-.customInput {
+#customInput {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.customInput input {
+#customInput input {
     height: 35px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
@@ -85,7 +85,7 @@ h1 {
     border-bottom-left-radius: 3px;
 }
 
-.customInput button {
+#customInput button {
     height: 35px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
@@ -108,4 +108,12 @@ button {
     top: 15px;
     right: 15px;
     display: none;
+}
+
+#callCode {
+    display: none;
+}
+
+#or {
+    margin: 1rem auto;
 }
